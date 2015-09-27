@@ -25,23 +25,21 @@ class HttpYeahYouKnowMe
     env_hash["REQUEST_METHOD"] = method
     env_hash["PATH_INFO"] = path
     env_hash["VERSION"] = version
-    # hash = {}
-    # client.each_line do |line|
-    #   break if line == "\r\n"
-    #   key, value = line.split(': ')
-    #   hash[key] = value
-    # end
+    headers = {}
+    client.each_line do |line|
+      break if line == "\r\n"
+      key, value = line.split(': ')
+      headers[key] = value
+    end
     response(env_hash, client)
   end
 
   def response(env_hash, client)
-    stuff = app.call(env_hash)
-    client.print("HTTP/1.1 #{stuff[0]} OK\r\n")
-    stuff[1].each do |key, value|
-      client.print "#{key}: #{value}\r\n"
-    end
+    response_array = app.call(env_hash)
+    client.print("HTTP/1.1 #{response_array[0]} OK\r\n")
+    response_array[1].each { |key, value| client.print "#{key}: #{value}\r\n" }
     client.print("\r\n")
-    client.print stuff[2][0]
+    client.print response_array[2][0]
     client.close
   end
 
@@ -50,11 +48,3 @@ class HttpYeahYouKnowMe
     server.close_write
   end
 end
-
-
-# client.print("HTTP/1.1 200 OK\r\n")
-# client.print("Content-Type: text/html; charset=UTF-8\r\n")
-# client.print("Content-Length: 50\r\n")
-# client.print("\r\n")
-# client.print("<HTML><HEAD><h1>Hello World!</h1></HEAD><BODY></BODY>\r\n")
-# client.close
