@@ -1,6 +1,7 @@
 require 'socket'
 require 'stringio'
 require 'pry'
+require_relative 'parse'
 
 class HttpYeahYouKnowMe
   attr_accessor :port, :app, :server
@@ -13,29 +14,9 @@ class HttpYeahYouKnowMe
   def start
     until server.closed? do
       client = server.accept
-      parse_request(client)
+      env_hash = Parse.call(client)
+      response(env_hash, client)
     end
-  end
-
-  def parse_request(client)
-
-    method, path, version = client.gets.split(" ")
-    env_hash = {}
-    env_hash["REQUEST_METHOD"] = method
-    env_hash["PATH_INFO"] = path
-    env_hash["VERSION"] = version
-    headers = {}
-    client.each_line do |line|
-      break if line == "\r\n"
-      key, value = line.split(': ')
-      headers[key] = value
-    end
-    if headers.keys.include?("Content-Length")
-      env_hash["rack.input"] = StringIO.new(client.read(headers.fetch("Content-Length").chomp.to_i))
-    else
-      env_hash["rack.input"] = ""
-    end
-    response(env_hash, client)
   end
 
   def response(env_hash, client)
