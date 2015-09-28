@@ -1,5 +1,5 @@
 require_relative 'http_yeah_you_know_me'
-require '/Users/shannonpaige/code/night_writer/lib/night_write'
+require '/Users/robbielane/turing/mod_1/projects/night_writer/lib/night_write_web'
 
 # require a webserver named Sinatra
 require 'sinatra/base'
@@ -14,7 +14,7 @@ class NightWriterServer < Sinatra::Base
 
   post '/to_braille' do
     message = params['english-message']
-    braille = NightWrite.translate_to_braille(message)
+    braille = ConvertText.to_braille(message)
     "<pre>#{braille}</pre>"
   end
 end

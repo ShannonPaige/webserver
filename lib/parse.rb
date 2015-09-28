@@ -12,7 +12,8 @@ class Parse
       headers[key] = value
     end
     if headers.keys.include?("Content-Length")
-      env_hash["rack.input"] = StringIO.new(client.read(headers.fetch("Content-Length").chomp.to_i))
+      content_length = headers.fetch("Content-Length").chomp.to_i
+      env_hash["rack.input"] = StringIO.new(client.read(content_length))
     else
       env_hash["rack.input"] = ""
     end
