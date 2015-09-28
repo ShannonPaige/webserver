@@ -1,4 +1,5 @@
 require 'socket'
+require 'stringio'
 require 'pry'
 
 class HttpYeahYouKnowMe
@@ -17,10 +18,8 @@ class HttpYeahYouKnowMe
   end
 
   def parse_request(client)
-    first_line = client.gets.split(" ")
-    method = first_line[0]
-    path = first_line[1]
-    version = first_line[2]
+
+    method, path, version = client.gets.split(" ")
     env_hash = {}
     env_hash["REQUEST_METHOD"] = method
     env_hash["PATH_INFO"] = path
@@ -30,6 +29,11 @@ class HttpYeahYouKnowMe
       break if line == "\r\n"
       key, value = line.split(': ')
       headers[key] = value
+    end
+    if headers.keys.include?("Content-Length")
+      env_hash["rack.input"] = StringIO.new(client.read(headers.fetch("Content-Length").chomp.to_i))
+    else
+      env_hash["rack.input"] = ""
     end
     response(env_hash, client)
   end

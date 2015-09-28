@@ -3,7 +3,6 @@ require 'rest-client' # you may need to `gem install rest-client`
 
 RSpec.describe 'Acceptance test' do
   def run_server(port, app, &block)
-
     server = HttpYeahYouKnowMe.new(port, app)
     thread = Thread.new { server.start }
     thread.abort_on_exception = true
@@ -18,7 +17,6 @@ RSpec.describe 'Acceptance test' do
     path_info = "this value should be overridden by the app!"
 
     app = lambda do |env_hash|
-
       path_info = env_hash['PATH_INFO']
       body      = "hello, class ^_^"
       [200, {'Content-Type' => 'text/plain', 'Content-Length' => body.length, 'omg' => 'bbq'}, [body]]
