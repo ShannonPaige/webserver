@@ -6,7 +6,7 @@ class Parse
     env_hash["PATH_INFO"] = path
     env_hash["VERSION"] = version
     headers = parse_headers(client)
-    env_hash = parse_body(client)
+    env_hash = parse_body(client, headers, env_hash)
   end
 
   def self.parse_headers(client)
@@ -19,7 +19,7 @@ class Parse
     headers
   end
 
-  def self.parse_body(client)
+  def self.parse_body(client, headers, env_hash)
     if headers.keys.include?("Content-Length")
       content_length = headers.fetch("Content-Length").chomp.to_i
       env_hash["rack.input"] = StringIO.new(client.read(content_length))
